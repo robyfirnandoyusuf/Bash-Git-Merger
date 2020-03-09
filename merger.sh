@@ -21,14 +21,19 @@ list_branches(){
 
 merge_brach(){
 	list_branches
-	read -p "Merge Current Branch with which branch ? : " to
+	read -p "Merge branch destination ? : " destination
 
-	fixBranch=${myArray[$to]##*\/}
-	if [[ $from != $fixBranch ]]; then
-		echo $(git checkout $fixBranch)
+	fixDestination=${myArray[$destination]##*\/}
+	if [[ $from != $fixDestination ]]; then
+		echo $(git checkout $fixDestination)
 	fi
 
-	pull=$(git pull origin $fixBranch)
+	read -p "Merge $fixDestination with which branch ? : " to
+	s=${myArray[$to]}
+	sourceBranch="${s##*/}"
+
+	pull=$(git pull origin $sourceBranch)
+
 	if [[ $pull == *"Already"* ]]; then
 		echo "Everything is up to date !"
 	elif [[ $pull == *"CONFLICT"* ]]; then
@@ -43,8 +48,11 @@ merge_brach(){
 				echo "[$x]" $cok
 				y=$((x++))
 			done
-			read -p "Push Branch To : " to
-			echo $(git push origin $fixBranch)
+			read -p "Push Branch To : " pushTo
+
+			branchRemoteDest=${myArray[$pushTo]}
+			remoteDestBranch="${branchRemoteDest##*/}"
+			echo $(git push origin $remoteDestBranch)
 		else
 			echo "-- ./logout --"
 		fi
